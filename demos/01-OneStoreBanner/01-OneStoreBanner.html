@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <!--网页文档的三要素-->
+    <title>一号店带进度条的轮播特效</title>
+    <meta name="keywords" content="关键词:提供给搜索引擎搜索网站">
+    <meta name="description" content="描述:对网页内容的大概介绍">
+
+    <style>
+        body, ul, li, p {
+            margin: 0;
+            padding: 0;
+            /*
+                单独设置:
+                margin-top:上
+                margin-bottom:下
+                margin-left:左
+                margin-right:右
+
+                统一设置
+                margin:10px;上下左右都相等10
+                margin:10px 20px;上下10  左右20
+                margin:10px 20px 30px;上10 左右20 下 30
+                margin:10px 20px 30px 40px;顺时针方向 上右下左
+            */
+        }
+
+        #box {
+            position: relative; /*相对定位:参考物  相对于自己的位置定位*/
+            width: 330px; /*宽度*/
+            height: 360px; /*高度*/
+            background: red; /*背景颜色*/
+            margin: 100px auto; /*上下100px 左右自动(居中)*/
+            overflow: hidden; /*超出隐藏*/
+        }
+
+        #box ul.img { /* . class类选择器*/
+            position: relative; /*相对定位*/
+            left: 0;
+            width: 990px;
+        }
+
+        #box ul.img li { /*混合选择器*/
+            list-style: none; /*去除前面的小黑圆点*/
+            float: left; /*浮动：与父元素左端对齐依次的往右端显示 显示不下就换行显示  漂浮起来了 原来所占据的空间不存在了*/
+        }
+
+        #box ul.icon {
+            position: absolute; /*绝对定位:漂浮起来了  层级 相对于有定位属性(relative absolute fixed)的最近的父元素定位*/
+            left: 110px; /*距离参考物左端的距离*/
+            bottom: 20px; /*距离参考物下端的距离*/
+        }
+
+        #box ul.icon li {
+            width: 30px;
+            height: 6px;
+            background: #000;
+            float: left;
+            margin-right: 10px;
+            list-style: none;
+        }
+
+        #box ul.icon li p {
+            width: 0;
+            height: 6px;
+            background: red;
+        }
+
+    </style>
+</head>
+<body>
+
+<div id="box">
+    <ul class="img">
+        <li><img src="images/1.jpg"></li>
+        <li><img src="images/2.jpg"></li>
+        <li><img src="images/3.jpg"></li>
+    </ul>
+    <ul class="icon">
+        <li><p></p></li>
+        <li><p></p></li>
+        <li><p></p></li>
+    </ul>
+</div>
+
+<script src="../../js/jquery-1.11.1.min.js"></script>
+
+<script>
+    var n = 0;//全局变量
+    var timer = null;
+    var $p = $("#box ul.icon li p");//把p存储的地址赋值给$p这个变量
+    var $img = $("#box ul.img");
+
+    $("ul.icon li").hover(function () {//鼠标移上去实现什么效果
+        //获取鼠标移上去的图标的索引 $(this)鼠标移到谁上面就指代谁
+        n = $(this).index();
+        //eq(n)获取到索引为n的p
+        $(this).find("p").css("width", "30px").parent().siblings().find("p").css("width", "0px");
+        $img.animate({"left": -330 * n + "px"}, 500);
+        n += 1;
+    });
+
+    //鼠标移动到大盒子上面停止定时器
+    $("#box").hover(function () {//鼠标移上去停止定时器
+        clearInterval(timer);//清楚定时器
+        $p.eq(n - 1).stop().css("width", "30px");
+    }, function () {//鼠标移开开启定时器
+        $p.eq(n - 1).stop().css("width", "0px");
+        n -= 1;//让n减去一个1
+        auto();
+        timer = setInterval(auto, 2500);
+    });
+
+    timer = setInterval(auto, 2500);
+
+    auto();
+
+    function auto() {
+        $p.eq(n).animate({"width": "30px"}, 2000, function () {
+            //等动画执行完成再执行什么
+            $(this).css("width", "0px");
+            //animate()自定义动画500毫秒
+            $img.animate({"left": -330 * n + "px"}, 500);
+        });
+        n++;//n= n+1
+        n %= 3;// 0/3 = 0 余0     1/3 = 0余1     2/3 = 0 余2     3/3 = 1余0      4/3=1 余1
+        /*if (n>2)//0 1 2
+         {
+         n = 0
+         }*/
+    }
+</script>
+
+</body>
+</html>
